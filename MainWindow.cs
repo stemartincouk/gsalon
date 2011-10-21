@@ -14,17 +14,16 @@ public partial class MainWindow: Gtk.Window
 	{
 		Application.Init ();
 	
-			this.Resize(640,460);
+			this.Resize(640,480);
 			//menu bar very top
 			MenuBar mb = new MenuBar ();
-			
 			Menu fileMenu = new Menu ();
 			MenuItem menuItem = new MenuItem ("_File");
 			menuItem.Submenu = fileMenu;
 			mb.Append(menuItem);
 			MenuItem menuFileQuit = new MenuItem("Quit");
 			fileMenu.Append(menuFileQuit);
-			vboxMain.PackStart(mb);
+			vboxMain.PackStart(mb,false,false,0);
 			
 			//toolbar
 			Toolbar tbTop = new Toolbar ();
@@ -48,7 +47,7 @@ public partial class MainWindow: Gtk.Window
 			hbTop.PackStart(tbTop);
 			hbTop.PackStart(lbMediaTemp);
 			//pack the top hbox in the main vbox
-			vboxMain.PackStart(hbTop);
+			vboxMain.PackStart(hbTop,false,false,1);
 			// horizontal pane
 			
 			verticalPane.Pack1(scrollWindowLeft,false,false);
@@ -63,7 +62,7 @@ public partial class MainWindow: Gtk.Window
 			verticalPane.ShowAll();
 			//status bar very bottom
 			Statusbar sb = new Statusbar ();
-			vboxMain.PackStart(sb);
+			vboxMain.PackStart(sb,false,false,1);
 			
 			
 
