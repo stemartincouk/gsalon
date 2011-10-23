@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Gtk;
+using gsalon;
 
 public partial class MainWindow: Gtk.Window
 {	
@@ -10,6 +12,12 @@ public partial class MainWindow: Gtk.Window
 	ScrolledWindow scrollWindowRight = new ScrolledWindow ();
 	Viewport viewPortLeft = new Viewport ();
 	Viewport viewPortRight = new Viewport ();
+	Entry tbSearch ;
+	HBox hboxSearch;
+	VBox vboxVpLeft;
+	TreeView tvResults = new TreeView ();
+	
+	
 	public MainWindow (): base (Gtk.WindowType.Toplevel)
 	{
 		Application.Init ();
@@ -49,7 +57,7 @@ public partial class MainWindow: Gtk.Window
 			//pack the top hbox in the main vbox
 			vboxMain.PackStart(hbTop,false,false,1);
 			// horizontal pane
-			
+			verticalPane.Position=200;
 			verticalPane.Pack1(scrollWindowLeft,false,false);
 			verticalPane.Pack2(scrollWindowRight,false,false);
 			vboxMain.PackStart(verticalPane);
@@ -79,8 +87,25 @@ public partial class MainWindow: Gtk.Window
 		Build ();
 	}
 
+	void HandleTbSearchKeyReleaseEvent (object o, KeyReleaseEventArgs args)
+	{
+		//get results live on key up
+		staff staffMember = new staff();
+		staffMember.fName = "ted";
+		List<staff> searchResults = new List<staff> ();
+		searchResults = staffMember.search_staff(tbSearch.Text);
+		Console.WriteLine("Search Results found: "+searchResults.Count.ToString());
+		//staffMember.get_staff_member();
+		foreach(staff sr in searchResults)
+		{
+			
+			Console.WriteLine(sr.fName+" "+sr.lName);	
+		}
+	}
+
 	void HandleTbClientsClicked (object sender, EventArgs e)
 	{
+		viewPortRight.Remove(viewPortLeft.Child);
 		Label lbClients =new Label ();
 		lbClients.Text ="Im the clients bit";
 		viewPortLeft.Remove(viewPortLeft.Child);
@@ -88,6 +113,13 @@ public partial class MainWindow: Gtk.Window
 		viewPortLeft.Show();
 		lbClients.Show();
 		Console.WriteLine("Clients Clicked");
+		staff s = new staff ();
+	    List<staff> staffList = new List<staff>();
+		staffList= s.get_all_staff_members();
+		foreach(staff sm in staffList)
+		{
+			Console.WriteLine(sm.fName);
+		}
 		
 		
 		
@@ -95,18 +127,73 @@ public partial class MainWindow: Gtk.Window
 
 	void HandleTbStaffClicked (object sender, EventArgs e)
 	{
-		ToolButton tb =(ToolButton)sender;
-	
+		//set up search input
+		tbSearch=new Entry ();
+		tbSearch.KeyReleaseEvent+= HandleTbSearchKeyReleaseEvent;
+		viewPortLeft.Remove(viewPortLeft.Child);
+		
+		hboxSearch = new HBox ();
+		vboxVpLeft = new VBox ();
+		
+		Button btSearchGo = new Button ();
+		btSearchGo.Clicked+= HandleBtSearchGoClicked;
+		
+		btSearchGo.Label="Go";
 		viewPortLeft.Remove(viewPortLeft.Child);
 		Label lbStaff = new Label ();
 		lbStaff.Text="im the staff bit";
 		
 		
-		viewPortLeft.Add(lbStaff);
+		viewPortLeft.Add(vboxVpLeft);
+		hboxSearch.PackStart(tbSearch,true,true,1);
+		hboxSearch.PackStart(btSearchGo,false,false,1);
+		vboxVpLeft.PackStart(hboxSearch,false,false,1);
 		viewPortLeft.Show();
 		lbStaff.Show();
+		tbSearch.Show();
+		vboxVpLeft.ShowAll();
 		
 		Console.WriteLine("staff clicked");
+	}
+
+	void HandleBtSearchGoClicked (object sender, EventArgs e)
+	{
+		tvResults.Destroy();
+		tvResults = new TreeView ();
+		Console.WriteLine("Searched: "+tbSearch.Text);
+		staff staffMember = new staff();
+		staffMember.fName = "ted";
+		List<staff> searchResults = new List<staff> ();
+		searchResults = staffMember.search_staff(tbSearch.Text);
+		Console.WriteLine("Search Results found: "+searchResults.Count.ToString());
+		//staffMember.get_staff_member();
+		foreach(staff sr in searchResults)
+		{
+			
+			Console.WriteLine(sr.fName+" "+sr.lName);	
+		}
+		
+		//Console.WriteLine(staffMember.fName);
+		Gtk.ListStore searchResultsStore  = new Gtk.ListStore (typeof (string));
+		searchResultsStore.AppendValues ("Gerry");
+		Gtk.CellRendererText staffResult = new Gtk.CellRendererText ();
+		
+		tvResults.Model = searchResultsStore;
+		
+		vboxVpLeft.PackStart(tvResults);
+		TreeViewColumn tvcName = new TreeViewColumn ();
+		tvcName.Title="Name";
+		tvcName.PackStart(staffResult,true);
+		tvResults.AppendColumn(tvcName);
+		tvcName.AddAttribute (staffResult, "text", 0);
+		tvResults.Show();
+		vboxVpLeft.PackStart(tvResults);
+		
+		
+	
+		
+		
+	
 	}
 	
 	protected void OnDeleteEvent (object sender, DeleteEventArgs a)
