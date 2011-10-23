@@ -24,7 +24,7 @@ namespace gsalon
           	"Server=localhost;" +
           	"Database=gsalon;" +
           	"User ID=root;" +
-          	"Password=Lilley1!;" +
+          	"Password=pass123;" +
           	"Pooling=false";
 	  
        		IDbConnection dbcon;
@@ -74,7 +74,7 @@ namespace gsalon
           	"Server=localhost;" +
           	"Database=gsalon;" +
           	"User ID=root;" +
-          	"Password=Lilley1!;" +
+          	"Password=pass123;" +
           	"Pooling=false";
 	  
        		IDbConnection dbcon;
